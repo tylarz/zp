@@ -129,6 +129,7 @@ export async function buildCommsConfig(
     clientOptions: Pick<
         WaAuthClientOptions,
         | 'deviceBrowser'
+        | 'deviceUserAgentPlatform'
         | 'deviceOsDisplayName'
         | 'deviceOsVersion'
         | 'requireFullSync'
@@ -246,27 +247,29 @@ export async function buildCommsConfig(
                 ? false
                 : undefined,
             loginPayloadConfig: loginIdentity
-                ? {
-                      username: loginIdentity.username,
-                      device: loginIdentity.device,
-                      loginCounter: credentials.loginCounter ?? 0,
-                      connectAttemptCount: clientOptions.connectAttemptCount ?? 0,
-                      deviceBrowser: clientOptions.deviceBrowser,
-                      deviceOsDisplayName: clientOptions.deviceOsDisplayName,
-                      versionBase
-                  }
-                : undefined,
+    ? {
+          username: loginIdentity.username,
+          device: loginIdentity.device,
+          loginCounter: credentials.loginCounter ?? 0,
+          connectAttemptCount: clientOptions.connectAttemptCount ?? 0,
+          deviceBrowser: clientOptions.deviceBrowser,
+          deviceUserAgentPlatform: clientOptions.deviceUserAgentPlatform,
+          deviceOsDisplayName: clientOptions.deviceOsDisplayName,
+          versionBase
+      }
+    : undefined,
             registrationPayloadConfig: !loginIdentity
-                ? {
-                      registrationInfo: credentials.registrationInfo,
-                      signedPreKey: credentials.signedPreKey,
-                      deviceBrowser: clientOptions.deviceBrowser,
-                      deviceOsDisplayName: clientOptions.deviceOsDisplayName,
-                      deviceOsVersion: clientOptions.deviceOsVersion,
-                      requireFullSync: clientOptions.requireFullSync,
-                      versionBase
-                  }
-                : undefined
+    ? {
+          registrationInfo: credentials.registrationInfo,
+          signedPreKey: credentials.signedPreKey,
+          deviceBrowser: clientOptions.deviceBrowser,
+          deviceUserAgentPlatform: clientOptions.deviceUserAgentPlatform,
+          deviceOsDisplayName: clientOptions.deviceOsDisplayName,
+          deviceOsVersion: clientOptions.deviceOsVersion,
+          requireFullSync: clientOptions.requireFullSync,
+          versionBase
+      }
+    : undefined
         }
     }
 }
