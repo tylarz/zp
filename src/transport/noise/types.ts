@@ -42,3 +42,5 @@ export interface WaRegistrationPayloadConfig extends WaPayloadCommonConfig {
     readonly deviceProps?: Uint8Array
     readonly requireFullSync?: boolean
 }
+
+export type WaUserAgentPlatform = 'web' | 'android' | 'smb_android'
