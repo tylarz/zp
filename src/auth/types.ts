@@ -74,6 +74,14 @@ export interface WaAuthClientOptions {
      */
     readonly deviceBrowser?: string
     /**
+     * Platform advertised in ClientPayload.UserAgent.
+     * Defaults to 'web'.
+     *
+     * Use 'android' to emulate the Android companion profile
+     * while retaining the WebSocket transport.
+     */
+    readonly deviceUserAgentPlatform?: 'web' | 'android'
+    /**
      * Override the numeric companion platform id (see
      * {@link WA_COMPANION_PLATFORM_IDS}). Inferred from `deviceBrowser` when
      * omitted – set explicitly for non-browser platforms (Electron, UWP, ...).
