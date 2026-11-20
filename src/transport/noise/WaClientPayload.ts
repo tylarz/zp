@@ -58,9 +58,15 @@ function defaultWebSubPlatform(): number {
 }
 
 export function resolveDevicePropsPlatformType(
-    deviceBrowser?: string
+    deviceBrowser?: string,
+    deviceUserAgentPlatform?: 'web' | 'android'
 ): proto.DeviceProps.PlatformType {
+    if (deviceUserAgentPlatform === 'android') {
+        return proto.DeviceProps.PlatformType.ANDROID_PHONE
+    }
+
     const normalized = deviceBrowser?.trim().toLowerCase()
+
     switch (normalized) {
         case 'chrome':
             return proto.DeviceProps.PlatformType.CHROME
@@ -95,13 +101,18 @@ export function resolveDevicePropsPlatformType(
 
 function defaultUserAgent(
     versionBase: string,
-    version?: ParsedVersion
+    version?: ParsedVersion,
+    deviceUserAgentPlatform: 'web' | 'android' = 'web'
 ): typeof proto.ClientPayload.prototype.userAgent {
     const { primary, secondary, tertiary, quaternary, quinary } =
         version ?? parseVersion(versionBase)
+
     const locale = resolveLocale()
+
     return {
-        platform: proto.ClientPayload.UserAgent.Platform.WEB,
+        platform: deviceUserAgentPlatform === 'android'
+            ? proto.ClientPayload.UserAgent.Platform.ANDROID
+            : proto.ClientPayload.UserAgent.Platform.WEB,
         releaseChannel: proto.ClientPayload.UserAgent.ReleaseChannel.RELEASE,
         appVersion: {
             primary,
@@ -120,7 +131,6 @@ function defaultUserAgent(
         localeCountryIso31661Alpha2: locale.lc
     }
 }
-
 type OsVersion = {
     readonly primary: number
     readonly secondary?: number
@@ -153,13 +163,17 @@ function parseOsVersion(osVersion: string | null | undefined): OsVersion | undef
 function defaultDeviceProps(
     config: Pick<
         WaRegistrationPayloadConfig,
-        'deviceBrowser' | 'deviceOsDisplayName' | 'deviceOsVersion' | 'requireFullSync'
+        | 'deviceBrowser'
+        | 'deviceUserAgentPlatform'
+        | 'deviceOsDisplayName'
+        | 'deviceOsVersion'
+        | 'requireFullSync'
     >
 ): Uint8Array {
     return proto.DeviceProps.encode({
         os: config.deviceOsDisplayName ?? process.platform,
         version: parseOsVersion(config.deviceOsVersion ?? getRuntimeOsVersion()),
-        platformType: resolveDevicePropsPlatformType(config.deviceBrowser),
+        platformType: resolveDevicePropsPlatformType(config.deviceBrowser, config.deviceUserAgentPlatform),
         requireFullSync: config.requireFullSync === true,
         historySyncConfig: {
             storageQuotaMb: 114_149,
@@ -191,18 +205,26 @@ function buildCommonPayload(
     readonly connectType: number
     readonly connectReason: number
     readonly userAgent: typeof proto.ClientPayload.prototype.userAgent
-    readonly webInfo: typeof proto.ClientPayload.prototype.webInfo
+    readonly webInfo?: typeof proto.ClientPayload.prototype.webInfo
 } {
     const versionBase = config.versionBase ?? WA_VERSION
+    const isAndroid = config.deviceUserAgentPlatform === 'android'
+
     return {
         passive: config.passive === true,
         pull: config.pull ?? defaultPull,
         connectType: proto.ClientPayload.ConnectType.WIFI_UNKNOWN,
         connectReason: proto.ClientPayload.ConnectReason.USER_ACTIVATED,
-        userAgent: config.userAgent ?? defaultUserAgent(versionBase, version),
-        webInfo: config.webInfo ?? {
-            webSubPlatform: defaultWebSubPlatform()
-        }
+        userAgent: config.userAgent ?? defaultUserAgent(
+            versionBase,
+            version,
+            config.deviceUserAgentPlatform
+        ),
+        ...(!isAndroid && {
+            webInfo: config.webInfo ?? {
+                webSubPlatform: defaultWebSubPlatform()
+            }
+        })
     }
 }
 
