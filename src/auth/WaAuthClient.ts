@@ -133,7 +133,7 @@ export class WaAuthClient {
                       getCredentials: () => this.credentials,
                       updateCredentials: this.updateCredentials.bind(this)
                   },
-                  deviceType: resolveDevicePropsPlatformType(device.browser)
+                  deviceType: resolveDevicePropsPlatformType(device.browser, options.deviceUserAgentPlatform)
               })
             : null
     }
@@ -198,6 +198,7 @@ export class WaAuthClient {
         return buildCommsConfig(this.logger, this.requireCredentials(), socketOptions, {
             connectAttemptCount: this.connectAttemptCount,
             deviceBrowser: this.options.deviceBrowser,
+            deviceUserAgentPlatform: this.options.deviceUserAgentPlatform,
             deviceOsDisplayName: this.options.deviceOsDisplayName,
             deviceOsVersion: this.options.deviceOsVersion,
             requireFullSync: this.options.requireFullSync,
