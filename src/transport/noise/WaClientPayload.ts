@@ -178,13 +178,13 @@ function defaultDeviceProps(
         | 'requireFullSync'
     >
 ): Uint8Array {
-    if (deviceUserAgentPlatform === 'android' || deviceUserAgentPlatform === 'smb_android') {
-        return proto.DeviceProps.PlatformType.ANDROID_PHONE
-    }
     return proto.DeviceProps.encode({
         os: config.deviceOsDisplayName ?? process.platform,
         version: parseOsVersion(config.deviceOsVersion ?? getRuntimeOsVersion()),
-        platformType: resolveDevicePropsPlatformType(config.deviceBrowser, config.deviceUserAgentPlatform),
+        platformType: resolveDevicePropsPlatformType(
+            config.deviceBrowser,
+            config.deviceUserAgentPlatform
+        ),
         requireFullSync: config.requireFullSync === true,
         historySyncConfig: {
             storageQuotaMb: 114_149,
