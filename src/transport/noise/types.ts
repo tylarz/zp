@@ -1,6 +1,8 @@
 import type { Proto } from '@proto'
 import type { RegistrationInfo, SignedPreKeyRecord } from '@signal/types'
 
+export type WaUserAgentPlatform = 'web' | 'android' | 'smb_android'
+
 export interface WaPayloadCommonConfig {
     readonly passive?: boolean
     /**
@@ -20,6 +22,7 @@ export interface WaPayloadCommonConfig {
     readonly deviceOsVersion?: string
     readonly userAgent?: typeof Proto.ClientPayload.prototype.userAgent
     readonly webInfo?: typeof Proto.ClientPayload.prototype.webInfo
+    readonly deviceUserAgentPlatform?: WaUserAgentPlatform
 }
 
 export interface WaLoginPayloadConfig extends WaPayloadCommonConfig {
@@ -42,5 +45,3 @@ export interface WaRegistrationPayloadConfig extends WaPayloadCommonConfig {
     readonly deviceProps?: Uint8Array
     readonly requireFullSync?: boolean
 }
-
-export type WaUserAgentPlatform = 'web' | 'android' | 'smb_android'
