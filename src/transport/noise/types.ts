@@ -10,6 +10,7 @@ export interface WaPayloadCommonConfig {
     readonly pull?: boolean
     readonly versionBase?: string
     readonly deviceBrowser?: string
+    readonly deviceUserAgentPlatform?: 'web' | 'android'
     readonly deviceOsDisplayName?: string
     /**
      * OS version advertised in `DeviceProps.version` (`'10'`, `'14.6'`, ...).
