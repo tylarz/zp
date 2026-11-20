@@ -615,6 +615,7 @@ export function buildWaClientDependencies(input: {
     const authClient = new WaAuthClient(
         {
             deviceBrowser: options.deviceBrowser,
+            deviceUserAgentPlatform: options.deviceUserAgentPlatform,
             deviceOsDisplayName: options.deviceOsDisplayName,
             deviceOsVersion: options.deviceOsVersion,
             devicePlatform: options.devicePlatform,
