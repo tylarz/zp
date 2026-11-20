@@ -3,7 +3,8 @@ import { proto } from '@proto'
 import type {
     WaLoginPayloadConfig,
     WaPayloadCommonConfig,
-    WaRegistrationPayloadConfig
+    WaRegistrationPayloadConfig,
+    WaUserAgentPlatform
 } from '@transport/noise/types'
 import { intToBytes } from '@util/bytes'
 import { getRuntimeOsVersion } from '@util/runtime'
@@ -59,9 +60,12 @@ function defaultWebSubPlatform(): number {
 
 export function resolveDevicePropsPlatformType(
     deviceBrowser?: string,
-    deviceUserAgentPlatform?: 'web' | 'android'
+    deviceUserAgentPlatform?: WaUserAgentPlatform
 ): proto.DeviceProps.PlatformType {
-    if (deviceUserAgentPlatform === 'android') {
+    if (
+        deviceUserAgentPlatform === 'android' ||
+        deviceUserAgentPlatform === 'smb_android'
+    ) {
         return proto.DeviceProps.PlatformType.ANDROID_PHONE
     }
 
@@ -102,20 +106,20 @@ export function resolveDevicePropsPlatformType(
 function defaultUserAgent(
     versionBase: string,
     version?: ParsedVersion,
-    deviceUserAgentPlatform: 'web' | 'android' = 'web'
+    deviceUserAgentPlatform: WaUserAgentPlatform = 'web'
 ): typeof proto.ClientPayload.prototype.userAgent {
     const { primary, secondary, tertiary, quaternary, quinary } =
         version ?? parseVersion(versionBase)
 
     const locale = resolveLocale()
-    const platform =
-    deviceUserAgentPlatform === 'smb_android'
-        ? proto.ClientPayload.UserAgent.Platform.SMB_ANDROID
-        : deviceUserAgentPlatform === 'android'
-            ? proto.ClientPayload.UserAgent.Platform.ANDROID
-            : proto.ClientPayload.UserAgent.Platform.WEB
+
     return {
-        platform,
+        platform:
+            deviceUserAgentPlatform === 'smb_android'
+                ? proto.ClientPayload.UserAgent.Platform.SMB_ANDROID
+                : deviceUserAgentPlatform === 'android'
+                    ? proto.ClientPayload.UserAgent.Platform.ANDROID
+                    : proto.ClientPayload.UserAgent.Platform.WEB,
         releaseChannel: proto.ClientPayload.UserAgent.ReleaseChannel.RELEASE,
         appVersion: {
             primary,
@@ -134,6 +138,7 @@ function defaultUserAgent(
         localeCountryIso31661Alpha2: locale.lc
     }
 }
+
 type OsVersion = {
     readonly primary: number
     readonly secondary?: number
@@ -214,7 +219,8 @@ function buildCommonPayload(
     readonly webInfo?: typeof proto.ClientPayload.prototype.webInfo
 } {
     const versionBase = config.versionBase ?? WA_VERSION
-    const isAndroid = config.deviceUserAgentPlatform === 'android'
+    const platform = config.deviceUserAgentPlatform ?? 'web'
+    const omitWebInfo = platform === 'android'
 
     return {
         passive: config.passive === true,
@@ -224,9 +230,9 @@ function buildCommonPayload(
         userAgent: config.userAgent ?? defaultUserAgent(
             versionBase,
             version,
-            config.deviceUserAgentPlatform
+            platform
         ),
-        ...(!isAndroid && {
+        ...(!omitWebInfo && {
             webInfo: config.webInfo ?? {
                 webSubPlatform: defaultWebSubPlatform()
             }
@@ -263,15 +269,15 @@ export function buildRegistrationPayload(config: WaRegistrationPayloadConfig): U
     const version = parseVersion(versionBase)
     const common = buildCommonPayload(config, false, version)
     const devicePairingData = {
-        buildHash: config.buildHash ?? md5Bytes(versionBase),
-        deviceProps: config.deviceProps ?? defaultDeviceProps(config),
-        eRegid: intToBytes(4, registrationId),
-        eKeytype: intToBytes(1, 5),
-        eIdent: config.registrationInfo.identityKeyPair.pubKey,
-        eSkeyId: intToBytes(3, signedPreKeyId),
-        eSkeyVal: config.signedPreKey.keyPair.pubKey,
-        eSkeySig: config.signedPreKey.signature
-    }
+    buildHash: config.buildHash ?? md5Bytes(versionBase),
+    deviceProps: config.deviceProps ?? defaultDeviceProps(config),
+    eRegid: intToBytes(4, registrationId),
+    eKeytype: intToBytes(1, 5),
+    eIdent: config.registrationInfo.identityKeyPair.pubKey,
+    eSkeyId: intToBytes(3, signedPreKeyId),
+    eSkeyVal: config.signedPreKey.keyPair.pubKey,
+    eSkeySig: config.signedPreKey.signature
+}
     return proto.ClientPayload.encode({
         ...common,
         devicePairingData
