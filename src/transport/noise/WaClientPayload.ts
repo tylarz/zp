@@ -108,11 +108,14 @@ function defaultUserAgent(
         version ?? parseVersion(versionBase)
 
     const locale = resolveLocale()
-
-    return {
-        platform: deviceUserAgentPlatform === 'android'
+    const platform =
+    deviceUserAgentPlatform === 'smb_android'
+        ? proto.ClientPayload.UserAgent.Platform.SMB_ANDROID
+        : deviceUserAgentPlatform === 'android'
             ? proto.ClientPayload.UserAgent.Platform.ANDROID
-            : proto.ClientPayload.UserAgent.Platform.WEB,
+            : proto.ClientPayload.UserAgent.Platform.WEB
+    return {
+        platform,
         releaseChannel: proto.ClientPayload.UserAgent.ReleaseChannel.RELEASE,
         appVersion: {
             primary,
@@ -170,6 +173,9 @@ function defaultDeviceProps(
         | 'requireFullSync'
     >
 ): Uint8Array {
+    if (deviceUserAgentPlatform === 'android' || deviceUserAgentPlatform === 'smb_android') {
+        return proto.DeviceProps.PlatformType.ANDROID_PHONE
+    }
     return proto.DeviceProps.encode({
         os: config.deviceOsDisplayName ?? process.platform,
         version: parseOsVersion(config.deviceOsVersion ?? getRuntimeOsVersion()),
