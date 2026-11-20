@@ -8,7 +8,10 @@ export type {
     WaDownloadMediaOptions,
     WaGroupHistoryBundleEvent,
     WaHistorySyncChunkEvent,
+    WaHistorySyncChunkRef,
+    WaHistorySyncItem,
     WaHistorySyncOptions,
+    WaHistorySyncSink,
     WaWriteBehindOptions
 } from '@client/types'
 export type { WaClientPluginContext, WaClientPluginDefinition } from '@client/plugins'
@@ -17,6 +20,7 @@ export type {
     WaMessageCoordinator,
     WaShareGroupHistoryInput,
     WaShareGroupHistoryResult,
+    WaSyncSignalSessionOptions,
     WaUploadMediaOptions,
     WaUploadMediaType
 } from '@client/coordinators/WaMessageCoordinator'
@@ -146,6 +150,7 @@ export type {
     WaCommunitySubGroupsResult,
     WaGroupCoordinator,
     WaGroupCreateOptions,
+    WaGroupJoinViaLinkResult,
     WaGroupMetadata,
     WaGroupParticipant,
     WaLinkSubGroupsResult,
@@ -225,6 +230,8 @@ export type {
     WaUsernameResult
 } from '@client/coordinators/WaProfileCoordinator'
 export type { WaProfilePictureType } from '@transport/node/builders/profile'
+export { listMexArgoWireTypeNames, registerMexArgoWireType } from '@transport/node/mex/argo-wire'
+export type { WaArgoWire, WaArgoWireField } from '@transport/node/mex/argo-wire'
 export { parseUsyncResultEnvelope } from '@transport/node/builders/usync'
 export type { WaUsyncProtocolError, WaUsyncResultEnvelope } from '@transport/node/builders/usync'
 export type {
@@ -291,7 +298,11 @@ export type {
     WaLinkPreviewThumbnailStream,
     WaLinkPreviewType
 } from '@message/addons/link-preview/types'
-export type { SignalLidSyncResult } from '@signal/api/SignalDeviceSyncApi'
+export type {
+    SignalLidSyncError,
+    SignalLidSyncResult,
+    SignalLidSyncStatus
+} from '@signal/api/SignalDeviceSyncApi'
 export type { WaAuthCredentials, WaVersionResolver } from '@auth/types'
 export type { WaShortcakeAssertionSigner } from '@auth/pairing/WaShortcakeFlow'
 export type { BinaryNode } from '@transport/types'
