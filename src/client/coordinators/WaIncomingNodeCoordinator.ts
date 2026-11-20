@@ -1,3 +1,4 @@
+import { isGroupJid } from '@protocol/jid'
 import type { WaAuthCredentials, WaSuccessPersistAttributes } from '@auth/types'
 import type { WaOfflineResumeCoordinator } from '@client/coordinators/WaOfflineResumeCoordinator'
 import { parseChatstateNode } from '@client/events/chatstate'
@@ -379,6 +380,16 @@ export class WaIncomingNodeCoordinator {
         this.registerIncomingHandler({
             tag: WA_MESSAGE_TAGS.MESSAGE,
             handler: runtime.handleIncomingMessageNode
+        })
+        this.registerIncomingHandler({
+            tag: 'status',
+            handler: async node => {
+                const hasEncryptedContent = Array.isArray(node.content) && node.content.some(child => child.tag === WA_MESSAGE_TAGS.ENC)
+                if (!node.attrs.from?.endsWith('@g.us') || !hasEncryptedContent) {
+                    return false
+                }
+                return runtime.handleIncomingMessageNode(node)
+            }
         })
         this.registerIncomingHandler({
             tag: WA_MESSAGE_TAGS.RECEIPT,
