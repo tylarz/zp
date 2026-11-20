@@ -80,7 +80,7 @@ export interface WaAuthClientOptions {
      * Use 'android' to emulate the Android companion profile
      * while retaining the WebSocket transport.
      */
-    readonly deviceUserAgentPlatform?: 'web' | 'android'
+    readonly deviceUserAgentPlatform?: 'web' | 'android' | 'smb_android'
     /**
      * Override the numeric companion platform id (see
      * {@link WA_COMPANION_PLATFORM_IDS}). Inferred from `deviceBrowser` when
