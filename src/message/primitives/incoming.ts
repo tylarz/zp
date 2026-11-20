@@ -606,7 +606,7 @@ export async function handleIncomingMessageAck(
     node: BinaryNode,
     options: WaIncomingMessageAckHandlerOptions
 ): Promise<boolean> {
-    if (node.tag !== WA_MESSAGE_TAGS.MESSAGE) {
+    if (node.tag !== WA_MESSAGE_TAGS.MESSAGE && node.tag !== 'status') {
         return false
     }
 
